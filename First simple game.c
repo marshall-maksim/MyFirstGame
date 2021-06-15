@@ -1,51 +1,69 @@
-/* Chapter 4. Ex. 3 */
+/* First simple game */
 
 #include <stdio.h>
 #include <locale.h>
-#include <conio.h>
+#include <conio.h>      //дл€ getch()
+#include <stdlib.h>		//дл€ rand() и RAND_MAX
 
 int main(void){
 	setlocale(LC_ALL, "Rus");
-	char screen[30][40];
+	char screen[20][31];       //игровое поле
 	int x, y;
-	int xDog = 15, 
-		yDog = 20;
-	char key;
-	do
-	{
-		
-		/*«адание границ игрового пол€*/
-		for (x = 0; x < 30; x++){
-			for (y = 0; y < 40; y++){
-				if(x == 0 || x == 29)
-					 screen[x][y] = '#';
-		 		 else if(y == 0 || y == 39)
-		 		 	  screen[x][y] = '#';
-	 	  		  else
-	 	  		  	  screen[x][y] = ' ';
-			}
+	int score = -1;				//счет (-1 инкрементируетс€ в 0 при первой генерации координат цели)
+	int xDog = 10, 				//текущиемкоординаты геро€
+		yDog = 10,				//
+		bfr_xDog,				//предыдущие координаты геро€
+		bfr_yDog,				//
+		xPurpose = xDog,		//координаты цели (при первой инициализации равны координатам 
+		yPurpose = yDog;		//геро€ дл€ правильного запуска их последующей генерации)
+	char key;	
+	int i;				//нажата€ клавиша
+	
+	do{
+		/*»нициализаци€ границ игрового пол€*/
+		sprintf(screen[0], "#############################");          
+		for(i = 1; i<20; i++){
+			sprintf(screen[i], "#                           #");
 		}
+		sprintf(screen[19], "#############################");
 		
 		/*«адание координат геро€*/
+		bfr_xDog = xDog;
+		bfr_yDog = yDog;
 		if(key == 'w') xDog--;
 		if(key == 's') xDog++;
 		if(key == 'a') yDog--;
 		if(key == 'd') yDog++;
-		screen[xDog][yDog] = '@';
-		
-		/*ѕрорисовка кадра*/
-		system("cls");                    //ќчистка экрана
-		for(x = 0; x < 30; x++){
-			for(y = 0; y < 40; y++){
-				printf(" %c", screen[x][y]);
-			}
-			printf("\n");
+		if(screen[xDog][yDog] == '#'){
+			xDog = bfr_xDog;
+			yDog = bfr_yDog;
 		}
 		
-		key = getch();                //—читывание нажати€ кнопки
+		screen[xDog][yDog] = '@';
 		
-	} while (key  != 'q');
-	printf("\n***********************************GAME OVER************************************\n");
+		/*«адание координат цели*/
+		if(xPurpose == xDog && yPurpose == yDog){
+			score++;
+			srand(time(NULL));
+			xPurpose = rand()%18;
+			yPurpose = rand()%28;
+			if(xPurpose == 0) xPurpose++;
+			if(yPurpose == 0) yPurpose++;
+		}
+		
+		screen[xPurpose][yPurpose] = '*';
+		
+		system("cls");
+		
+		/*¬ывод игрового пол€ на экран*/
+		for(i = 0; i < 20; i++)									
+			  printf("%s\n", screen[i]);
+  			  printf("SCORE: %d", score);
+  			  key = getch();
+	} while(key  != 'q');
+	
+
+	printf("\n**********GAME OVER**********\n");
 		
 	return 0;
 }
