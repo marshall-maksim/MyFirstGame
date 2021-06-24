@@ -4,6 +4,7 @@
 #include <locale.h>
 #include <conio.h>      //для getch()
 #include <stdlib.h>		//для rand() и RAND_MAX
+#include <windows.h>
 
 #define DOG_START_X 10
 #define DOG_START_Y 10
@@ -23,10 +24,8 @@ void InitMap(void);
 void SetDog(void);	
 void SetPurpose(void);	
 void ShowMap(void);	
+void setCurs(int x, int y);
 	
-char key;					//нажатая клавиша
-int i;	
-			
 int main(void){
 	setlocale(LC_ALL, "Rus");
 	do{
@@ -34,12 +33,10 @@ int main(void){
 		SetDog();
 		SetPurpose();
 		
-		system("cls");
+		setCurs(0,0);
 		
 		ShowMap();
-		
-	 	key = getch();
-	} while(key  != 'q');
+	} while(GetKeyState(VK_ESCAPE) >=0);
 	
 
 	printf("\n**********GAME OVER**********\n");
@@ -51,6 +48,7 @@ int main(void){
 /*Инициализация игрового поля*/
 void InitMap()
 {
+	int i;
 	sprintf(screen[0], "#############################");          
 		for(i = 1; i<20; i++){
 			sprintf(screen[i], "#                           #");
@@ -64,10 +62,10 @@ void SetDog()
 {
 	BfrDog.x = Dog.x;
 	BfrDog.y = Dog.y;
-	if(key == 'w') Dog.x--;
-	if(key == 's') Dog.x++;
-	if(key == 'a') Dog.y--;
-	if(key == 'd') Dog.y++;
+	if(GetKeyState(VK_UP) < 0) Dog.x--;
+	if(GetKeyState(VK_DOWN) < 0) Dog.x++;
+	if(GetKeyState(VK_LEFT) < 0) Dog.y--;
+	if(GetKeyState(VK_RIGHT) < 0) Dog.y++;
 	if(screen[Dog.x][Dog.x] == '#'){
 		Dog.x = BfrDog.x;
 		Dog.y = BfrDog.y;
@@ -94,7 +92,18 @@ void SetPurpose()
 /*Отображение игрового поля на экране*/
 void ShowMap()
 {
+	int i;
  	 for(i = 0; i < 20; i++)									
 		 printf("%s\n", screen[i]);
 	printf("SCORE: %d", score);
+}
+
+/*Сдвигает курсор*/
+void setCurs(int x, int y)
+{
+	COORD coord;
+	coord.X = x;
+	coord.Y = y;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+	Sleep(40);
 }
